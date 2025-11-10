@@ -1,15 +1,11 @@
 package com.ops.ICmaps.Edge;
 
-import com.ops.ICmaps.Node.Node;
 import jakarta.persistence.*;
 
 import java.util.Objects;
 
 @Entity
-@Table(name = "edges", indexes = {
-    @Index(name = "idx_edges_from", columnList = "from_node_id"),
-    @Index(name = "idx_edges_to", columnList = "to_node_id")
-})
+@Table(name = "edges")
 public class Edge {
 
     @Id
@@ -65,7 +61,8 @@ public class Edge {
             return false;
         }
         Edge edge = (Edge) o;
-        return Double.compare(distanceMeters, edge.distanceMeters) == 0 && Objects.equals(key, edge.key) && Objects.equals(fromNode, edge.fromNode) && Objects.equals(toNode, edge.toNode);
+        return Double.compare(distanceMeters, edge.distanceMeters) == 0 && Objects.equals(key, edge.key)
+                && Objects.equals(fromNode, edge.fromNode) && Objects.equals(toNode, edge.toNode);
     }
 
     @Override

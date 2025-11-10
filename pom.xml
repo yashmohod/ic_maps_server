@@ -47,11 +47,21 @@
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
-		</dependency>
+		</dependency> -->
+		<!-- Maven -->
+<dependency>
+  <groupId>org.hibernate.orm</groupId>
+  <artifactId>hibernate-community-dialects</artifactId>
+  <!-- Let Spring Boot BOM manage the version; or match your core 6.x version -->
+</dependency>
+<dependency>
+  <groupId>org.xerial</groupId>
+  <artifactId>sqlite-jdbc</artifactId>
+</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>

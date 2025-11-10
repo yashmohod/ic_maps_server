@@ -53,6 +53,7 @@ public class BuildingController {
 
         String respMessage = br.findById(newBuilding.getId()).map(curBuilding -> {
             curBuilding.setName(newBuilding.getName());
+
             return "Building name update!";
         }).orElseGet(() -> {
             return "Building not found!";

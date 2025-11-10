@@ -39,7 +39,14 @@ public class Map {
         this.objectMapper = objectMapper;
     }
 
-    public record EdgeDTO(String id, String from, String to, double distance) {
+    @GetMapping("/")
+    public ObjectNode HealthCheck() {
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.put("message", "Found it!");
+        return objectNode;
+    }
+
+    public record EdgeDTO(String key, String from, String to, double distance) {
 
     }
 
@@ -52,10 +59,10 @@ public class Map {
 
         List<EdgeDTO> edgeDTOs = edges.stream()
                 .map(e -> new EdgeDTO(
-                e.getKey(),
-                e.getFromNode(),
-                e.getToNode(),
-                e.getDistance()))
+                        e.getKey(),
+                        e.getFromNode(),
+                        e.getToNode(),
+                        e.getDistance()))
                 .toList();
 
         objectNode.set("nodes", objectMapper.valueToTree(nodes));
@@ -85,19 +92,19 @@ public class Map {
             String to = args.get("to").asText();
 
             Double[] FromCords = nr.findById(from).map(foundNode -> {
-                Double[] Foundlatlng = {foundNode.getLat(), foundNode.getLng()};
+                Double[] Foundlatlng = { foundNode.getLat(), foundNode.getLng() };
                 return Foundlatlng;
             }).orElseGet(() -> {
-                Double[] Foundlatlng = {Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY};
+                Double[] Foundlatlng = { Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY };
                 return Foundlatlng;
 
             });
 
             Double[] ToCords = nr.findById(to).map(foundNode -> {
-                Double[] Foundlatlng = {foundNode.getLat(), foundNode.getLng()};
+                Double[] Foundlatlng = { foundNode.getLat(), foundNode.getLng() };
                 return Foundlatlng;
             }).orElseGet(() -> {
-                Double[] Foundlatlng = {Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY};
+                Double[] Foundlatlng = { Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY };
                 return Foundlatlng;
 
             });
@@ -121,15 +128,14 @@ public class Map {
         return objectNode;
     }
 
-    // distane in meters 
+    // distane in meters
     Double calDistance(Double lat1, Double lon1, Double lat2, Double lon2) {
         Double R = 6371.0; // Radius of the earth in km
-        Double dLat = deg2rad(lat2 - lat1);  // deg2rad below
+        Double dLat = deg2rad(lat2 - lat1); // deg2rad below
         Double dLon = deg2rad(lon2 - lon1);
-        Double a
-                = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+        Double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
                 + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2))
-                * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                        * Math.sin(dLon / 2) * Math.sin(dLon / 2);
         Double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         Double d = R * c; // Distance in km
         return d * 1000;
