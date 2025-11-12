@@ -22,6 +22,10 @@ public class Edge {
     @ManyToMany(mappedBy = "edges")
     Set<NavMode> navModes;
 
+    public Set<NavMode> getNavModes() {
+        return navModes;
+    }
+
     protected Edge() {
 
     }

@@ -9,8 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface EdgeRepository extends JpaRepository<Edge, String> {
 
-    @Query("select e.fromNode as fromNode, e.toNode as toNode, e.distanceMeters as distanceMeters from Edge e")
-    List<EdgeLight> findAllLight();
+    List<Edge> findByFromNodeAndToNode(String fromNode, String toNode);
 
     List<Edge> findByFromNode(String fromNode);
 

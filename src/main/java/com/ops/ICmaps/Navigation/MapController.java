@@ -2,6 +2,7 @@ package com.ops.ICmaps.Navigation;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,6 +19,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
 import com.ops.ICmaps.Edge.Edge;
 import com.ops.ICmaps.Edge.EdgeRepository;
+import com.ops.ICmaps.Navigation.GraphService.Adj;
 import com.ops.ICmaps.Node.Node;
 import com.ops.ICmaps.Node.NodeRepository;
 
@@ -27,21 +29,31 @@ import org.springframework.web.bind.annotation.PathVariable;
 @RestController
 @CrossOrigin
 @RequestMapping("/map")
-public class MapRoute {
+public class MapController {
 
     private final NodeRepository nr;
     private final EdgeRepository er;
     private final ObjectMapper objectMapper;
+    private final GraphService gs;
 
-    public MapRoute(EdgeRepository er, NodeRepository nr, ObjectMapper objectMapper) {
+    public MapController(GraphService gs, EdgeRepository er, NodeRepository nr, ObjectMapper objectMapper) {
         this.nr = nr;
         this.er = er;
+        this.gs = gs;
         this.objectMapper = objectMapper;
     }
 
     @GetMapping("/")
     public ObjectNode HealthCheck() {
         ObjectNode objectNode = objectMapper.createObjectNode();
+
+        // gs.loadGraph();
+
+        Map<String, List<Adj>> graph = gs.getGraph();
+        System.out.println("should be here" + graph.size());
+        for (var cur : graph.entrySet()) {
+            System.out.println(cur.getKey());
+        }
         objectNode.put("message", "Found it!");
         return objectNode;
     }

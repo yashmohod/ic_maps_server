@@ -1,14 +1,13 @@
 package com.ops.ICmaps;
 
-import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +20,8 @@ import com.ops.ICmaps.Edge.Edge;
 import com.ops.ICmaps.Edge.EdgeRepository;
 import com.ops.ICmaps.NavMode.NavMode;
 import com.ops.ICmaps.NavMode.NavModeRepository;
+import com.ops.ICmaps.Navigation.GraphService;
+import com.ops.ICmaps.Navigation.GraphService.Adj;
 import com.ops.ICmaps.Node.Node;
 import com.ops.ICmaps.Node.NodeRepository;
 
@@ -32,13 +33,13 @@ class LoadDatabase {
     private final NodeRepository nr;
     private final EdgeRepository er;
     private final NavModeRepository navr;
-    private final ObjectMapper objectMapper;
+    private final GraphService gs;
 
-    public LoadDatabase(NavModeRepository navr, EdgeRepository er, NodeRepository nr, ObjectMapper objectMapper) {
+    public LoadDatabase(GraphService gs, NavModeRepository navr, EdgeRepository er, NodeRepository nr) {
         this.nr = nr;
         this.er = er;
+        this.gs = gs;
         this.navr = navr;
-        this.objectMapper = objectMapper;
     }
 
     @Bean
@@ -83,7 +84,7 @@ class LoadDatabase {
                         Double latTo = (Double) to.get(0);
                         Double lngTo = (Double) to.get(1);
 
-                        Double distance = calDistance(latFrom, lngFrom, latTo, lngTo);
+                        Double distance = gs.calDistance(latFrom, lngFrom, latTo, lngTo);
 
                         Edge newEdge = new Edge(
                                 distance,
@@ -107,23 +108,6 @@ class LoadDatabase {
                 log.error("Failed to load phaseOne.json", e);
             }
         };
-    }
-
-    // distane in meters
-    Double calDistance(Double lat1, Double lon1, Double lat2, Double lon2) {
-        Double R = 6371.0; // Radius of the earth in km
-        Double dLat = deg2rad(lat2 - lat1); // deg2rad below
-        Double dLon = deg2rad(lon2 - lon1);
-        Double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
-                + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2))
-                        * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        Double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        Double d = R * c; // Distance in km
-        return d * 1000; // Distance in km
-    }
-
-    Double deg2rad(Double deg) {
-        return deg * (Math.PI / 180);
     }
 
 }
