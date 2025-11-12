@@ -15,9 +15,11 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
+import com.ops.ICmaps.Buildings.BuildingRepository;
 import com.ops.ICmaps.Edge.Edge;
 import com.ops.ICmaps.Edge.EdgeRepository;
 import com.ops.ICmaps.NavMode.NavMode;
+import com.ops.ICmaps.NavMode.NavModeRepository;
 import com.ops.ICmaps.Node.Node;
 import com.ops.ICmaps.Node.NodeRepository;
 
@@ -26,13 +28,18 @@ public class GraphService {
 
     private final EdgeRepository edges;
     private final NodeRepository nodes;
+    private final NavModeRepository navr;
+    private final BuildingRepository building;
 
     // Volatile so reads require no locking
     private volatile Map<String, List<Adj>> adj = Map.of();
 
     private volatile Map<String, double[]> nodeCoords = Map.of(); // id -> [lat,lng]
 
-    public GraphService(EdgeRepository edges, NodeRepository nodes) {
+    public GraphService(BuildingRepository building, NavModeRepository navr, EdgeRepository edges,
+            NodeRepository nodes) {
+        this.navr = navr;
+        this.building = building;
         this.edges = edges;
         this.nodes = nodes;
     }
@@ -103,12 +110,14 @@ public class GraphService {
         return adj.getOrDefault(fromId, List.of());
     }
 
-    public String[] navigate(double lat, double lng, String DestinationId, Long navModeId) {
+    public String[] navigate(double lat, double lng, Long DestinationId, Long navModeId) {
 
         String startId = nearestNodeId(lat, lng);
+        NavMode pathNavMode = navr.findById(navModeId).get();
+        Set<Node> destinationNodes = building.findById(DestinationId).get().getNodes();
 
-        Map<String, String> path = Astar(startId, DestinationId, navModeId);
-        String cur = DestinationId;
+        Map<String, String> path = Astar(startId, destinationNodes, pathNavMode);
+        String cur = startId;
         String pathEdges[] = new String[path.size() - 1];
         for (int i = 0; i < pathEdges.length - 1; i += 1) {
             String nxt = path.get(cur);
@@ -125,10 +134,24 @@ public class GraphService {
         return pathEdges;
     }
 
-    private Map<String, String> Astar(String start, String end, Long navModeId) {
+    private Map<String, String> Astar(String start, Set<Node> end, NavMode pathNavMode) {
         if (start.equals(end)) {
             return null;
         }
+
+        Double endLat = 0.0;
+        Double endLng = 0.0;
+        Double N = 0.0;
+        Set<String> ends = new HashSet<>();
+        for (Node cur : end) {
+            N += 1;
+            endLat += cur.getLat();
+            endLng += cur.getLng();
+            ends.add(cur.getId());
+        }
+
+        endLat /= N;
+        endLng /= N;
 
         // f = g + h
         record State(String id, double f) {
@@ -139,13 +162,13 @@ public class GraphService {
         Set<String> closed = new HashSet<>();
 
         g.put(start, 0.0);
-        open.add(new State(start, heuristic(start, end)));
+        open.add(new State(start, heuristic(start, endLat, endLng)));
 
         while (!open.isEmpty()) {
             String cur = open.poll().id();
             if (!closed.add(cur))
                 continue; // skip if already expanded
-            if (cur.equals(end))
+            if (ends.contains(cur))
                 return parent;
 
             for (Adj e : neighbors(cur)) {
@@ -154,10 +177,10 @@ public class GraphService {
                     continue;
 
                 double tentative = g.get(cur) + e.distance();
-                if (tentative < g.getOrDefault(nxt, Double.POSITIVE_INFINITY)) {
+                if ((tentative < g.getOrDefault(nxt, Double.POSITIVE_INFINITY)) && e.navModes.contains(pathNavMode)) {
                     g.put(nxt, tentative);
-                    parent.put(nxt, cur);
-                    double f = tentative + heuristic(nxt, end);
+                    parent.put(cur, nxt);
+                    double f = tentative + heuristic(nxt, endLat, endLng);
                     open.add(new State(nxt, f));
                 }
             }
@@ -165,11 +188,11 @@ public class GraphService {
         return null;
     }
 
-    private double heuristic(String cur, String end) {
+    private double heuristic(String cur, Double endLat, Double endLng) {
         double start_ll[] = nodeCoords.get(cur);
-        double end_ll[] = nodeCoords.get(end);
-        double result = Math.sqrt(Math.pow(start_ll[0] - end_ll[0], 2) +
-                Math.pow(start_ll[1] - end_ll[1], 2));
+
+        double result = Math.sqrt(Math.pow(start_ll[0] - endLat, 2) +
+                Math.pow(start_ll[1] - endLng, 2));
         return result;
     }
 

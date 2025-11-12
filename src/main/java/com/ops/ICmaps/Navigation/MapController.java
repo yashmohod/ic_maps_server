@@ -46,15 +46,20 @@ public class MapController {
     @GetMapping("/")
     public ObjectNode HealthCheck() {
         ObjectNode objectNode = objectMapper.createObjectNode();
-
-        // gs.loadGraph();
-
-        Map<String, List<Adj>> graph = gs.getGraph();
-        System.out.println("should be here" + graph.size());
-        for (var cur : graph.entrySet()) {
-            System.out.println(cur.getKey());
-        }
         objectNode.put("message", "Found it!");
+        return objectNode;
+    }
+
+    @GetMapping("/routeto")
+    public ObjectNode Route(ObjectNode args) {
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        double lat = args.get("lat").asDouble();
+        double lng = args.get("lng").asDouble();
+        Long navModeId = args.get("navMode").asLong();
+        Long buildingId = args.get("navMode").asLong();
+
+        String[] path = gs.navigate(lat, lng, buildingId, navModeId);
+        objectNode.set("path", objectMapper.valueToTree(path));
         return objectNode;
     }
 

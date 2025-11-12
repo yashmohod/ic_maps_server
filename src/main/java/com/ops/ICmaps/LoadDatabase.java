@@ -51,6 +51,13 @@ class LoadDatabase {
 
             try (InputStreamReader reader = new InputStreamReader(json.getInputStream(), StandardCharsets.UTF_8)) {
 
+                String[] navModes = { "Pedestrian", "ADA", "Vehicular" };
+
+                for (String mode : navModes) {
+                    NavMode curMode = new NavMode(null, mode);
+                    navr.save(curMode);
+                }
+
                 JSONObject onj = (JSONObject) jp.parse(reader);
                 JSONArray features = (JSONArray) onj.get("features");
 
@@ -93,13 +100,6 @@ class LoadDatabase {
                                 key);
                         er.save(newEdge);
                     }
-                }
-
-                String[] navModes = { "Pedestrian", "ADA", "Vehicular" };
-
-                for (String mode : navModes) {
-                    NavMode curMode = new NavMode(null, mode);
-                    navr.save(curMode);
                 }
 
                 log.info("Ran - Preloading data from phaseOne.json");

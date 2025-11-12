@@ -186,7 +186,7 @@ public class NavModeController {
     public ObjectNode GetAllFeatures(@RequestParam Long navModeId) {
         ObjectNode objectNode = objectMapper.createObjectNode();
         NavMode curNavMode = navr.findById(navModeId).get();
-
+        System.out.println("here is the nav mode id :" + curNavMode);
         Set<Node> nodes = curNavMode.getNodes();
         Set<Edge> edges = curNavMode.getEdges();
 
