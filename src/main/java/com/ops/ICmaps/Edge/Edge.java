@@ -1,12 +1,17 @@
 package com.ops.ICmaps.Edge;
 
-import jakarta.persistence.*;
-
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
 import com.ops.ICmaps.NavMode.NavMode;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "edges")
@@ -16,6 +21,9 @@ public class Edge {
     private String key;
     private String fromNode;
     private String toNode;
+
+    private Boolean interBuildingEdge;
+    private String buildingId;
 
     // any metadata: distance in meters, cost, speed limit, etc.
     private double distanceMeters;
@@ -41,18 +49,22 @@ public class Edge {
 
     }
 
-    public Edge(double distanceMeters, String toNode, String fromNode, String key, Boolean biDirectional ) {
+    public Edge(double distanceMeters, String toNode, String fromNode, String key, Boolean biDirectional,Boolean interBuildingEdge,String buildingId ) {
         this.distanceMeters = distanceMeters;
         this.toNode = toNode;
         this.fromNode = fromNode;
         this.key = key;
         this.biDirectional = biDirectional;
-
+        this.interBuildingEdge = interBuildingEdge;
+        this.buildingId = buildingId;
     }
 
 
     public Boolean isBiDirectional(){
         return this.biDirectional;
+    }
+    public Boolean isInterBuildingEdge(){
+        return this.interBuildingEdge;
     }
     public void setBiDirectional(boolean val ){
         this.biDirectional = val;

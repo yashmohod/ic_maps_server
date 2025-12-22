@@ -1,6 +1,9 @@
 package com.ops.ICmaps.NavMode;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,10 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ops.ICmaps.Buildings.Building;
-import com.ops.ICmaps.Buildings.BuildingRepository;
 import com.ops.ICmaps.Edge.Edge;
 import com.ops.ICmaps.Edge.EdgeRepository;
+import com.ops.ICmaps.Navigation.GraphService;
 import com.ops.ICmaps.Navigation.MapController.EdgeDTO;
 import com.ops.ICmaps.Navigation.MapController.NodeDTO;
 import com.ops.ICmaps.Node.Node;
@@ -32,12 +34,14 @@ public class NavModeController {
     private final NodeRepository nr;
     private final EdgeRepository er;
     private final NavModeRepository navr;
+    private final GraphService gs;
     private final ObjectMapper objectMapper;
 
-    public NavModeController(NavModeRepository navr, EdgeRepository er, NodeRepository nr, ObjectMapper objectMapper) {
+    public NavModeController(GraphService gs,NavModeRepository navr, EdgeRepository er, NodeRepository nr, ObjectMapper objectMapper) {
         this.nr = nr;
         this.er = er;
         this.navr = navr;
+        this.gs =gs;
         this.objectMapper = objectMapper;
     }
 
@@ -121,6 +125,7 @@ public class NavModeController {
                         curNode.AddNavMode(curNavMode);
                         nr.save(curNode);
                         navr.save(curNavMode);
+                        gs.loadGraph();
                     } catch (Exception e) {
                         objectNode.put("message", e.toString());
                     }
@@ -133,7 +138,7 @@ public class NavModeController {
                         curNode.RemoveNavMode(curNavMode);
                         nr.save(curNode);
                         navr.save(curNavMode);
-
+                        gs.loadGraph();
                     } catch (Exception e) {
                         objectNode.put("message", e.toString());
                     }
@@ -149,6 +154,7 @@ public class NavModeController {
                         curEdge.AddNavMode(curNavMode);
                         navr.save(curNavMode);
                         er.save(curEdge);
+                        gs.loadGraph();
                     } catch (Exception e) {
                         objectNode.put("message", e.toString());
                     }
@@ -160,6 +166,7 @@ public class NavModeController {
                         curEdge.RemoveNavMode(curNavMode);
                         navr.save(curNavMode);
                         er.save(curEdge);
+                        gs.loadGraph();
                     } catch (Exception e) {
                         objectNode.put("message", e.toString());
                     }
@@ -210,7 +217,8 @@ public class NavModeController {
                 .map(e -> new NodeDTO(
                         e.getId(),
                         e.getLat(),
-                        e.getLng()))
+                        e.getLng(),
+                            e.isBlueLight()))
                 .toList();
         List<EdgeDTO> edgeDTOs = edges.stream()
                 .map(e -> new EdgeDTO(

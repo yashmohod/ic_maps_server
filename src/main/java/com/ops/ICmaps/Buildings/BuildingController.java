@@ -16,7 +16,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.ops.ICmaps.Edge.Edge;
+import com.ops.ICmaps.Edge.EdgeRepository;
+import com.ops.ICmaps.Navigation.GraphService;
+import static com.ops.ICmaps.Navigation.GraphService.calDistance;
 import com.ops.ICmaps.Node.Node;
 import com.ops.ICmaps.Node.NodeRepository;
 
@@ -26,12 +31,16 @@ import com.ops.ICmaps.Node.NodeRepository;
 public class BuildingController {
 
     private final NodeRepository nr;
+    private final EdgeRepository er;
     private final BuildingRepository br;
+    private final GraphService gs;
     private final ObjectMapper objectMapper;
 
-    public BuildingController(BuildingRepository br, NodeRepository nr, ObjectMapper objectMapper) {
+    public BuildingController(GraphService gs,EdgeRepository er,BuildingRepository br, NodeRepository nr, ObjectMapper objectMapper) {
         this.nr = nr;
         this.br = br;
+        this.er = er;
+        this.gs = gs;
         this.objectMapper = objectMapper;
     }
 
@@ -144,12 +153,25 @@ public class BuildingController {
         objectNode.set("buildings", objectMapper.valueToTree(NavmodeDTOs));
         return objectNode;
     }
+public record NodeDtoo(String id, double lat, double lng) {}
+
+
 
     @GetMapping("/nodesget")
     public ObjectNode GetAllBuildingNodes(@RequestParam String id) {
         ObjectNode objectNode = objectMapper.createObjectNode();
         Building building = br.findById(id).get();
-        objectNode.set("nodes", objectMapper.valueToTree(building.getNodes()));
+        Set<Node> Nodes =  building.getNodes();
+        
+        List<NodeDtoo> nodeDTOs = Nodes.stream()
+                .map(e -> new NodeDtoo(
+                        e.getId(),
+                        e.getLat(),
+                        e.getLng()
+                    ))
+                .toList();
+      
+        objectNode.set("nodes", objectMapper.valueToTree(nodeDTOs));
         return objectNode;
     }
 
@@ -157,29 +179,28 @@ public class BuildingController {
     public ObjectNode GetBuildingPos(@RequestParam String id) {
         ObjectNode objectNode = objectMapper.createObjectNode();
         Building building = br.findById(id).get();
-        // Set<Node> nodes = building.getNodes();
+        BuildingsDTO re = new BuildingsDTO(
+                        building.getId(),
+                        building.getName(),
+                        building.getLat(),
+                        building.getLng(),
+                   building.getPolyGon());
+        // building DTO (safe)
+    objectNode.set("building", objectMapper.valueToTree(re));
 
-        // double x = 0;
-        // double y = 0;
-        // double z = 0;
+    // node list as lightweight JSON to avoid cycles
+    ArrayNode nodesArray = objectNode.putArray("building_nodes");
+    for (Node n : building.getNodes()) {
+        ObjectNode nNode = objectMapper.createObjectNode();
+        nNode.put("id", n.getId());
+        nNode.put("lat", n.getLat());
+        nNode.put("lng", n.getLng());
+        // add only what the frontend needs
+        nodesArray.add(nNode);
+    }
 
-        // for (Node curNode : nodes) {
-        //     double lat_rad = Math.toRadians(curNode.getLat());
-        //     double lng_rad = Math.toRadians(curNode.getLng());
-        //     x += Math.cos(lat_rad) * Math.cos(lng_rad);
-        //     y += Math.cos(lat_rad) * Math.sin(lng_rad);
-        //     z += Math.sin(lat_rad);
-        // }
 
-        // x /= nodes.size();
-        // y /= nodes.size();
-        // z /= nodes.size();
-        // double hyp = Math.sqrt(x * x + y * y);
-        // double lat = Math.toDegrees(Math.atan2(z, hyp));
-        // double lng = Math.toDegrees(Math.atan2(y, x));
-
-        objectNode.put("lat", building.getLat());
-        objectNode.put("lng", building.getLng());
+	
         return objectNode;
     }
 
@@ -191,11 +212,26 @@ public class BuildingController {
         String nodeId = args.get("nodeId").asText();
 
         Building curBuilding = br.findById(buildingId).get();
+        Set<Node> curBuildingNodes = curBuilding.getNodes();
         Node curNode = nr.findById(nodeId).get();
+        
+        for(Node curBuildingNode: curBuildingNodes){
+            double distance = calDistance(curNode.getLat(), curNode.getLng(), curBuildingNode.getLat(), curBuildingNode.getLng());
+            Edge newEdge = new Edge(
+                                distance,
+                                curNode.getId(),
+                                curBuildingNode.getId(),
+                                curNode.getId()+"__"+curBuildingNode.getId(),
+                                true,
+                                true,
+                                curBuilding.getId());
+                        er.save(newEdge);
+        }
 
         curBuilding.addNode(curNode);
         nr.save(curNode);
         br.save(curBuilding);
+        gs.loadGraph();
         return objectNode;
     }
 
@@ -208,10 +244,16 @@ public class BuildingController {
 
         Building curBuilding = br.findById(buildingId).get();
         Node curNode = nr.findById(nodeId).get();
+        List<Edge> interBuildingEdges = er.findByBuildingId(buildingId);
+
+        for(Edge curEdge: interBuildingEdges){
+            er.delete(curEdge);
+        }
 
         curBuilding.removeNode(curNode);
         nr.save(curNode);
         br.save(curBuilding);
+        gs.loadGraph();
         return objectNode;
     }
 }

@@ -2,8 +2,6 @@ package com.ops.ICmaps;
 
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -15,15 +13,12 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ops.ICmaps.Buildings.Building;
 import com.ops.ICmaps.Buildings.BuildingRepository;
 import com.ops.ICmaps.Edge.Edge;
 import com.ops.ICmaps.Edge.EdgeRepository;
 import com.ops.ICmaps.NavMode.NavMode;
 import com.ops.ICmaps.NavMode.NavModeRepository;
 import com.ops.ICmaps.Navigation.GraphService;
-import com.ops.ICmaps.Navigation.GraphService.Adj;
 import com.ops.ICmaps.Node.Node;
 import com.ops.ICmaps.Node.NodeRepository;
 
@@ -64,14 +59,7 @@ class LoadDatabase {
                         navr.save(curMode);
                     }
                 }
-                // String[] buildings = { "West Tower", "East Tower", "Holmes Hall" };
 
-                // for (String building : buildings) {
-                //     if (!br.existsBuildingByName(building)) {
-                //         Building curBuilding = new Building(null, building);
-                //         br.save(curBuilding);
-                //     }
-                // }
                 JSONObject onj = (JSONObject) jp.parse(reader);
                 JSONArray features = (JSONArray) onj.get("features");
 
@@ -113,7 +101,9 @@ class LoadDatabase {
                                 fromId,
                                 toId,
                                 key,
-                                true);
+                                true,
+                                false,
+                                "");
                         er.save(newEdge);
                     }
                 }

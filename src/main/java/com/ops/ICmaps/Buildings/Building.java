@@ -1,9 +1,15 @@
 package com.ops.ICmaps.Buildings;
 
-import com.ops.ICmaps.Node.Node;
-import jakarta.persistence.*;
-
 import java.util.Set;
+
+import com.ops.ICmaps.Node.Node;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "building")

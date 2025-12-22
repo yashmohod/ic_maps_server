@@ -9,11 +9,14 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface EdgeRepository extends JpaRepository<Edge, String> {
 
-    List<Edge> findByFromNodeAndToNode(String fromNode, String toNode);
+    Edge findByFromNodeAndToNode(String fromNode, String toNode);
 
     List<Edge> findByFromNode(String fromNode);
 
     List<Edge> findByToNode(String toNode);
+
+    List<Edge> findByInterBuildingEdge(Boolean interBuildingEdge);
+    List<Edge> findByBuildingId(String buildingId);
 
     @Query("select distinct e from Edge e left join fetch e.navModes")
     List<Edge> findAllWithNavModes();

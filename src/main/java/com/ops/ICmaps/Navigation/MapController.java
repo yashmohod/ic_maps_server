@@ -1,34 +1,29 @@
 package com.ops.ICmaps.Navigation;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.gson.Gson;
 import com.ops.ICmaps.Edge.Edge;
 import com.ops.ICmaps.Edge.EdgeRepository;
 import com.ops.ICmaps.NavMode.NavMode;
 import com.ops.ICmaps.NavMode.NavModeRepository;
-import com.ops.ICmaps.Navigation.GraphService.Adj;
+import com.ops.ICmaps.Navigation.GraphService.ResponseObjectNavigateBlueLight;
+import static com.ops.ICmaps.Navigation.GraphService.calDistance;
 import com.ops.ICmaps.Node.Node;
 import com.ops.ICmaps.Node.NodeRepository;
-
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @CrossOrigin
@@ -95,6 +90,9 @@ public class MapController {
         System.out.println(lat + " " + lng + " " + navMode + " " + id);
         System.out.println("everything fine here");
         Set<String> path = gs.navigate(lat, lng, id, navMode);
+        for(String no : path){
+            System.out.println(no);
+        }
         objectNode.set("path", objectMapper.valueToTree(path));
         return objectNode;
     }
@@ -103,21 +101,23 @@ public class MapController {
 
     }
 
-    public record NodeDTO(String id, double lat, double lng) {
+    public record NodeDTO(String id, double lat, double lng, boolean isBlueLight) {
 
     }
 
     @GetMapping("/all")
-    public ObjectNode getAllNodes() {
+    public ObjectNode getAllFeatures() {
 
         ObjectNode objectNode = objectMapper.createObjectNode();
         List<Node> nodes = nr.findAll();
-        List<Edge> edges = er.findAll();
+        List<Edge> edges = er.findByInterBuildingEdge(false);
         List<NodeDTO> nodeDTOs = nodes.stream()
                 .map(e -> new NodeDTO(
                         e.getId(),
                         e.getLat(),
-                        e.getLng()))
+                        e.getLng(),
+                        e.isBlueLight()
+                    ))
                 .toList();
         List<EdgeDTO> edgeDTOs = edges.stream()
                 .map(e -> new EdgeDTO(
@@ -148,7 +148,7 @@ public class MapController {
 
             nr.save(new Node(id, lng, lat));
             objectNode.put("message", "Node added!");
-
+            gs.loadGraph();
         } else if (type.equals("edge")) {
             String key = args.get("key").asText();
             String from = args.get("from").asText();
@@ -181,9 +181,9 @@ public class MapController {
 
             double distance = calDistance(FromCords[0], FromCords[1], ToCords[0], ToCords[1]);
             System.out.println(distance);
-            er.save(new Edge(distance, to, from, key, biDirectional));
+            er.save(new Edge(distance, to, from, key, biDirectional,false,""));
             objectNode.put("message", "Edge added!");
-
+            gs.loadGraph();
         } else {
             System.out.println("feature not recognized!");
             objectNode.put("message", "Feature not recognized!");
@@ -192,22 +192,7 @@ public class MapController {
         return objectNode;
     }
 
-    // distane in meters
-    Double calDistance(Double lat1, Double lon1, Double lat2, Double lon2) {
-        Double R = 6371.0; // Radius of the earth in km
-        Double dLat = deg2rad(lat2 - lat1); // deg2rad below
-        Double dLon = deg2rad(lon2 - lon1);
-        Double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
-                + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2))
-                        * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        Double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        Double d = R * c; // Distance in km
-        return d * 1000;
-    }
-
-    Double deg2rad(Double deg) {
-        return deg * (Math.PI / 180);
-    }
+    
 
     @PutMapping("/")
     public ObjectNode UpdateNode(@RequestBody Node node) {
@@ -243,6 +228,7 @@ public class MapController {
         er.saveAll(fromEdges);
         er.saveAll(toEdges);
         nr.save(existingNode);
+        gs.loadGraph();
         objectNode.put("message", "Node updated!");
         return objectNode;
     }
@@ -262,15 +248,46 @@ public class MapController {
             er.deleteAll(fromEdges);
             nr.delete(curNode);
             objectNode.put("message", "Node and its edges deleted!");
+            gs.loadGraph();
         } else if (type.equals("edge")) {
             Edge curEdge = er.findById(featureKey).get();
             er.delete(curEdge);
             objectNode.put("message", "Edge deleted!");
+            gs.loadGraph();
         } else {
             System.out.println("feature not recognized!");
             objectNode.put("message", "Feature not recognized!");
         }
         return objectNode;
     }
+
+    @PostMapping("/bluelight")
+    public ObjectNode SetBlueLight(@RequestBody ObjectNode args) {
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        String nodeId = args.get("nodeId").asText();
+        boolean blueLight = args.get("isBlueLight").asBoolean();
+        System.out.println(blueLight);
+        Node curNode = nr.findById(nodeId).get();
+        curNode.setBlueLight(blueLight);
+        nr.save(curNode);
+        objectNode.put("message", "Blue light status updated!");
+        gs.loadGraph();
+        return objectNode;
+    }
+
+    @GetMapping("/bluelight")
+    public ObjectNode ERouteTo(@RequestParam Double lat, @RequestParam Double lng) {
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        System.out.println("*****************************************");
+        ResponseObjectNavigateBlueLight resp = gs.navigateBlueLight(lat, lng);
+
+        
+        objectNode.set("path", objectMapper.valueToTree(resp.getPath()));
+        objectNode.put("dest", resp.getDest());
+    gs.loadGraph();
+        return objectNode;
+    }
+
+    
 
 }

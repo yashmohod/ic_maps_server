@@ -1,7 +1,9 @@
 package com.ops.ICmaps.Node;
 
+import com.ops.ICmaps.Buildings.Building;
 import com.ops.ICmaps.Edge.Edge;
 import com.ops.ICmaps.NavMode.NavMode;
+
 
 import jakarta.persistence.*;
 
@@ -17,6 +19,7 @@ public class Node {
     private String id;
     private Double lat;
     private Double lng;
+    private boolean blueLight;
     // private boolean ada;
 
     @ManyToMany
@@ -34,9 +37,10 @@ public class Node {
     public Set<NavMode> getNavModes() {
         return navModes;
     }
+    
 
     @ManyToMany(mappedBy = "nodes")
-    Set<NavMode> buildings;
+    Set<Building> buildings;
 
     protected Node() {
     }
@@ -45,6 +49,7 @@ public class Node {
         this.lng = lng;
         this.lat = lat;
         this.id = id; 
+        this.blueLight = false;
     }
 
 
@@ -67,6 +72,14 @@ public class Node {
 
     public void setLng(Double lng) {
         this.lng = lng;
+    }
+
+    public boolean isBlueLight() {
+        return blueLight;
+    }
+
+    public void setBlueLight(boolean blueLight) {
+        this.blueLight = blueLight;
     }
 
     @Override
