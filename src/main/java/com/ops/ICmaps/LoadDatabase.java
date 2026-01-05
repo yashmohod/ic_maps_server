@@ -55,7 +55,7 @@ class LoadDatabase {
 
                 for (String mode : navModes) {
                     if (!navr.existsNavModeByName(mode)) {
-                        NavMode curMode = new NavMode(null, mode);
+                        NavMode curMode = new NavMode(null, mode,false);
                         navr.save(curMode);
                     }
                 }

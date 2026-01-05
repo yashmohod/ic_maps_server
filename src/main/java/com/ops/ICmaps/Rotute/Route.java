@@ -1,11 +1,12 @@
-package com.ops.ICmaps.User;
+package com.ops.ICmaps.Rotute;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name="user")
-public class User{
+@Table(name = "route")
+public class Route {
 
     @Id
     private Long id;
@@ -13,37 +14,39 @@ public class User{
     private boolean isAdmin;
     private boolean isRouteManager;
 
-
-    protected User(){
+    protected Route() {
 
     }
-    public User(Long id, String email){
+
+    public Route(Long id, String email) {
         this.id = id;
-        this.email=email;
-        this.isAdmin=false;
-        this.isRouteManager=false;
+        this.email = email;
+        this.isAdmin = false;
+        this.isRouteManager = false;
 
     }
 
-
-    public void setEmail(String email){
+    public void setEmail(String email) {
         this.email = email;
     }
-    public String getEmail(){
+
+    public String getEmail() {
         return this.email;
     }
 
-    public void setIsAdmin(boolean isAdmin){
+    public void setIsAdmin(boolean isAdmin) {
         this.isAdmin = isAdmin;
     }
-    public Boolean isAdmin(){
+
+    public Boolean isAdmin() {
         return this.isAdmin;
     }
 
-    public void setIsRouteManager(boolean isRouteManager){
+    public void setIsRouteManager(boolean isRouteManager) {
         this.isRouteManager = isRouteManager;
     }
-    public Boolean isRouteManager(){
+
+    public Boolean isRouteManager() {
         return this.isRouteManager;
     }
 }

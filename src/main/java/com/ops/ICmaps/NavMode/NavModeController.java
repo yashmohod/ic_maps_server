@@ -88,7 +88,7 @@ public class NavModeController {
         return objectNode;
     }
 
-    public record NavmodeDTO(Long id, String name) {
+    public record NavmodeDTO(Long id, String name, Boolean fromThrough) {
 
     }
 
@@ -100,7 +100,8 @@ public class NavModeController {
         List<NavmodeDTO> NavmodeDTOs = allNavModes.stream()
                 .map(e -> new NavmodeDTO(
                         e.getId(),
-                        e.getName()))
+                        e.getName(),
+                    e.isFromThrough()))
                 .toList();
         objectNode.set("NavModes", objectMapper.valueToTree(NavmodeDTOs));
         return objectNode;

@@ -23,14 +23,24 @@ public class NavMode {
         private Long id;
         @Column(name="name", unique=true)
         private String name;
+        private boolean fromThrough;
 
         protected NavMode() {
 
         }
 
-        public NavMode(Long id, String name) {
+        public NavMode(Long id, String name,boolean fromThrough) {
                 this.id = id;
                 this.name = name;
+                this.fromThrough = fromThrough;
+        }
+
+        public boolean isFromThrough(){
+                return this.fromThrough;
+        }
+
+        public void setIsFromThrough(boolean fromThrough){
+                this.fromThrough = fromThrough;
         }
 
         public Long getId() {
