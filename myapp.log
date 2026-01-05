@@ -36,3 +36,32 @@
 2025-12-29T11:20:35.158-05:00  INFO 29627 --- [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
 2025-12-29T11:20:35.163-05:00  INFO 29627 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
 2025-12-29T11:20:35.164-05:00  INFO 29627 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-01-05T10:29:45.107-05:00  INFO 28820 --- [main] com.ops.ICmaps.ICmapsApplicationTests    : Starting ICmapsApplicationTests using Java 25.0.1 with PID 28820 (started by ymohod in C:\Users\ymohod\OneDrive - Ithaca College\Desktop\DEV\ICmaps\ICmaps)
+2026-01-05T10:29:45.109-05:00  INFO 28820 --- [main] com.ops.ICmaps.ICmapsApplicationTests    : No active profile set, falling back to 1 default profile: "default"
+2026-01-05T10:29:46.762-05:00  INFO 28820 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-01-05T10:29:46.912-05:00  INFO 28820 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 133 ms. Found 5 JPA repository interfaces.
+2026-01-05T10:29:47.653-05:00  INFO 28820 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-01-05T10:29:47.874-05:00  INFO 28820 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.33.Final
+2026-01-05T10:29:47.980-05:00  INFO 28820 --- [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-01-05T10:29:48.993-05:00  INFO 28820 --- [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-01-05T10:29:49.138-05:00  INFO 28820 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-01-05T10:29:49.453-05:00  INFO 28820 --- [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.sqlite.jdbc4.JDBC4Connection@70c56434
+2026-01-05T10:29:49.458-05:00  INFO 28820 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-01-05T10:29:49.605-05:00  INFO 28820 --- [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 3.49.1
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-01-05T10:29:51.385-05:00  INFO 28820 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-01-05T10:29:51.491-05:00  INFO 28820 --- [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-01-05T10:29:52.407-05:00  INFO 28820 --- [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-01-05T10:29:54.191-05:00  WARN 28820 --- [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-01-05T10:29:56.311-05:00  INFO 28820 --- [main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2026-01-05T10:29:56.585-05:00  INFO 28820 --- [main] com.ops.ICmaps.ICmapsApplicationTests    : Started ICmapsApplicationTests in 11.99 seconds (process running for 13.725)
+2026-01-05T10:30:01.126-05:00  INFO 28820 --- [main] com.ops.ICmaps.LoadDatabase              : Ran - Preloading data from phaseOne.json
+2026-01-05T10:30:03.105-05:00  INFO 28820 --- [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-01-05T10:30:03.114-05:00  INFO 28820 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-01-05T10:30:03.123-05:00  INFO 28820 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
