@@ -150,8 +150,7 @@ public class RouteController {
       @RequestParam Double userLng) {
     ObjectNode objectNode = objectMapper.createObjectNode();
     Route curRoute = rr.findById(routeId).get();
-    Building curDestination = br.findById(curRoute.getDestinationId()).get();
-    Set<String> path = gr.navigate(userLat, userLng, curDestination.getId(), navModeId);
+    Set<String> path = gr.navigate(userLat, userLng, curRoute.getDestinationId(), navModeId);
 
     objectNode.set("path", objectMapper.valueToTree(path));
     return objectNode;
