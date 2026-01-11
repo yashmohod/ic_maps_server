@@ -1,6 +1,8 @@
 package com.ops.ICmaps.Rotute;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
@@ -8,45 +10,51 @@ import jakarta.persistence.Table;
 @Table(name = "route")
 public class Route {
 
-    @Id
-    private Long id;
-    private String email;
-    private boolean isAdmin;
-    private boolean isRouteManager;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  // good default for MySQL/Postgres auto-increment
+  private Long id;
+  private String destinationId;
+  private String destinationName;
+  private String userId;
+  private String name;
 
-    protected Route() {
+  protected Route() {
+  }
 
-    }
+  public Route(String userId, String destinationId, String destinationName, String name) {
+    this.userId = userId;
+    this.destinationName = destinationName;
+    this.destinationId = destinationId;
+    this.name = name;
+  }
 
-    public Route(Long id, String email) {
-        this.id = id;
-        this.email = email;
-        this.isAdmin = false;
-        this.isRouteManager = false;
+  public Long getId() {
+    return this.id;
+  }
 
-    }
+  public String getDestinationId() {
+    return this.destinationId;
+  }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+  public void setDestinationId(String destinationId) {
+    this.destinationId = destinationId;
+  }
 
-    public String getEmail() {
-        return this.email;
-    }
+  public String getDestinationName() {
+    return this.destinationName;
+  }
 
-    public void setIsAdmin(boolean isAdmin) {
-        this.isAdmin = isAdmin;
-    }
+  public void setDestinationName(String destinationName) {
+    this.destinationName = destinationName;
+  }
 
-    public Boolean isAdmin() {
-        return this.isAdmin;
-    }
+  public String getName() {
+    return this.name;
+  }
 
-    public void setIsRouteManager(boolean isRouteManager) {
-        this.isRouteManager = isRouteManager;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public Boolean isRouteManager() {
-        return this.isRouteManager;
-    }
 }
