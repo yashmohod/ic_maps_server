@@ -63,50 +63,50 @@ class LoadDatabase {
                 JSONObject onj = (JSONObject) jp.parse(reader);
                 JSONArray features = (JSONArray) onj.get("features");
 
-                for (Object elem : features) {
-                    JSONObject feature = (JSONObject) elem;
-                    JSONObject geometry = (JSONObject) feature.get("geometry");
-                    String type = (String) geometry.get("type");
-                    JSONArray cords = (JSONArray) geometry.get("coordinates");
-                    JSONObject prop = (JSONObject) feature.get("properties");
-                    // System.out.println(type);
+                // for (Object elem : features) {
+                //     JSONObject feature = (JSONObject) elem;
+                //     JSONObject geometry = (JSONObject) feature.get("geometry");
+                //     String type = (String) geometry.get("type");
+                //     JSONArray cords = (JSONArray) geometry.get("coordinates");
+                //     JSONObject prop = (JSONObject) feature.get("properties");
+                //     // System.out.println(type);
 
-                    if ("Point".equals(type) && !nr.existsById((String) prop.get("id"))) {
+                //     if ("Point".equals(type) && !nr.existsById((String) prop.get("id"))) {
 
-                        Node newNode = new Node(
-                                (String) prop.get("id"),
-                                (Double) cords.get(0),
-                                (Double) cords.get(1));
-                        nr.save(newNode);
-                    }
+                //         Node newNode = new Node(
+                //                 (String) prop.get("id"),
+                //                 (Double) cords.get(0),
+                //                 (Double) cords.get(1));
+                //         nr.save(newNode);
+                //     }
 
-                    if ("LineString".equals(type) && !er.existsById((String) prop.get("key"))) {
+                //     if ("LineString".equals(type) && !er.existsById((String) prop.get("key"))) {
 
-                        String key = (String) prop.get("key");
-                        String fromId = (String) prop.get("from");
-                        String toId = (String) prop.get("to");
+                //         String key = (String) prop.get("key");
+                //         String fromId = (String) prop.get("from");
+                //         String toId = (String) prop.get("to");
 
-                        JSONArray from = (JSONArray) cords.get(0);
-                        JSONArray to = (JSONArray) cords.get(1);
+                //         JSONArray from = (JSONArray) cords.get(0);
+                //         JSONArray to = (JSONArray) cords.get(1);
 
-                        Double latFrom = (Double) from.get(0);
-                        Double lngFrom = (Double) from.get(1);
-                        Double latTo = (Double) to.get(0);
-                        Double lngTo = (Double) to.get(1);
+                //         Double latFrom = (Double) from.get(0);
+                //         Double lngFrom = (Double) from.get(1);
+                //         Double latTo = (Double) to.get(0);
+                //         Double lngTo = (Double) to.get(1);
 
-                        Double distance = gs.calDistance(latFrom, lngFrom, latTo, lngTo);
+                //         Double distance = gs.calDistance(latFrom, lngFrom, latTo, lngTo);
 
-                        Edge newEdge = new Edge(
-                                distance,
-                                fromId,
-                                toId,
-                                key,
-                                true,
-                                false,
-                                "");
-                        er.save(newEdge);
-                    }
-                }
+                //         Edge newEdge = new Edge(
+                //                 distance,
+                //                 fromId,
+                //                 toId,
+                //                 key,
+                //                 true,
+                //                 false,
+                //                 "");
+                //         er.save(newEdge);
+                //     }
+                // }
 
                 log.info("Ran - Preloading data from phaseOne.json");
 

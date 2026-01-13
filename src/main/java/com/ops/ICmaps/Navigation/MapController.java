@@ -147,7 +147,6 @@ public class MapController {
 
       nr.save(new Node(id, lng, lat));
       objectNode.put("message", "Node added!");
-      gs.loadGraph();
     } else if (type.equals("edge")) {
       String key = args.get("key").asText();
       String from = args.get("from").asText();
@@ -182,12 +181,12 @@ public class MapController {
       System.out.println(distance);
       er.save(new Edge(distance, to, from, key, biDirectional, false, ""));
       objectNode.put("message", "Edge added!");
-      gs.loadGraph();
     } else {
       System.out.println("feature not recognized!");
       objectNode.put("message", "Feature not recognized!");
     }
 
+        gs.loadGraph();
     return objectNode;
   }
 
@@ -245,16 +244,16 @@ public class MapController {
       er.deleteAll(fromEdges);
       nr.delete(curNode);
       objectNode.put("message", "Node and its edges deleted!");
-      gs.loadGraph();
     } else if (type.equals("edge")) {
       Edge curEdge = er.findById(featureKey).get();
       er.delete(curEdge);
       objectNode.put("message", "Edge deleted!");
-      gs.loadGraph();
     } else {
       System.out.println("feature not recognized!");
       objectNode.put("message", "Feature not recognized!");
     }
+
+      gs.loadGraph();
     return objectNode;
   }
 

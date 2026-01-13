@@ -127,7 +127,6 @@ public class NavModeController {
                         curNode.AddNavMode(curNavMode);
                         nr.save(curNode);
                         navr.save(curNavMode);
-                        gs.loadGraph();
                     } catch (Exception e) {
                         objectNode.put("message", e.toString());
                     }
@@ -140,7 +139,6 @@ public class NavModeController {
                         curNode.RemoveNavMode(curNavMode);
                         nr.save(curNode);
                         navr.save(curNavMode);
-                        gs.loadGraph();
                     } catch (Exception e) {
                         objectNode.put("message", e.toString());
                     }
@@ -156,7 +154,6 @@ public class NavModeController {
                         curEdge.AddNavMode(curNavMode);
                         navr.save(curNavMode);
                         er.save(curEdge);
-                        gs.loadGraph();
                     } catch (Exception e) {
                         objectNode.put("message", e.toString());
                     }
@@ -168,7 +165,6 @@ public class NavModeController {
                         curEdge.RemoveNavMode(curNavMode);
                         navr.save(curNavMode);
                         er.save(curEdge);
-                        gs.loadGraph();
                     } catch (Exception e) {
                         objectNode.put("message", e.toString());
                     }
@@ -179,6 +175,7 @@ public class NavModeController {
             objectNode.put("message", "Feature type not recognized!");
         }
 
+      gs.loadGraph();
         return objectNode;
     }
 
